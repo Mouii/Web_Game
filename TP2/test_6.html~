@@ -3,29 +3,37 @@
 	<link rel="stylesheet" type="text/css" href="./style.css">
 	</head>
 	<body>
-	<div id="carre"></div>
+	<canvas id="canvas" width="1000" height="1000"></canvas>
 	</body>
 		<script>
 
-		var elem = document.getElementById("carre");
-		var left = 0;
+			window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
+                              window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
 
-		function animLoop(render, element) {
-			var running = new Date(); 
-			var lastFrame = new Date();
-			var raf = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame 
-				|| window.msRequestAnimationFrame || null;
-			function loop(now) {
-				raf(loop,element);
-				var deltaT = now - lastFrame;
-				if (deltaT < 160) running = render-deltaT;
+			var img = new Image();
+			img.src = "./images/coin-sprite-animation.png";
+			img.alt = "Ouïe";
+
+			var imgSrc = img.src;
+			var imgAlt = img.alt;
+			var imgNb = 0;
+			var canvas = document.getElementById("canvas");
+ 			var ctx = canvas.getContext("2d");
+		
+			function stepImg() {
+				ctx.save();
+				ctx.drawImage(img,imgNb, 0, 100, 100, 10, 10, 100, 100);
+				imgNb += 100;
+				if (imgNb <= 1000) {
+					requestAnimationFrame(stepImg);
+				} else
+				{
+					imgNb = 0;
+					requestAnimationFrame(stepImg);
+				}
 			}
-			loop(lastFrame);
-		}
 
-		animLoop(function(deltaT) {
-			elem.style.left = (left += 10 * deltaT/16) + "px";
-			if (left < 400) return false;
-		}, elem);
+		   	requestAnimationFrame(stepImg);
+
 		</script>
 </html>

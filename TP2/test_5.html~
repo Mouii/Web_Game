@@ -1,7 +1,6 @@
 <html>
 	<head>
 	<link rel="stylesheet" type="text/css" href="./style.css">
-
 	</head>
 	<body>
 	<div id="carre"></div>
@@ -20,7 +19,7 @@
 		  if (start === null) start = timestamp;
 		  progress = timestamp - start;
 		  d.style.left = progress/60 + "px";
-		  if (progress < 10000) {
+		  if (progress < 30000) {
 		    requestAnimationFrame(step);
 		  }
 		}
