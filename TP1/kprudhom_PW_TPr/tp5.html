@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Déplacement carré gauche-droite </title>
+	</head>
+	<style>
+		.carre {
+			position:relative;
+			width:50px;
+			height:50px;
+			background:red;
+		}
+	</style>
+
+	<script>
+			var intervalID;
+			var nbSquare = 10;
+			var i = 0;
+			var divTab = [];
+			var tmp;
+			var lefts = [];
+			var tmp = new Array();
+		
+			function Wait() {
+				while (i < nbSquare) {
+					creationCarre(i);
+					++i;
+				}
+				i = -1;
+				setTimeout(PreDraw, 4000);
+
+			}
+
+			function PreDraw() {
+				++i;
+				Draw(i);
+			}
+
+			function Draw(k) {
+				if (k < nbSquare) {				
+					Move(k);
+				}
+				setTimeout(PreDraw, 1000);
+			}
+		
+			function Move(p) {
+				var j = p;
+				tmp[p] = setInterval(function() {
+					var elem = document.getElementById(divTab[j].id);
+					elem.style.left = lefts[j] + "px";
+					lefts[j] += 10;
+					if(lefts[j] >= 500) {
+						clearInterval(tmp[p]);
+				}
+				},100);
+
+			}
+
+			function creationCarre(i) {
+				var newElem = document.createElement("div");
+				newElem.id = "carre"+i;
+				newElem.style.position = "relative";
+				newElem.style.width = 50 + "px";
+				newElem.style.height = 50 + "px";
+				newElem.style.background = "red";
+				document.body.appendChild(newElem);
+				divTab[i] = newElem;
+				lefts[i] = 10;
+			}
+
+	</script>
+
+<body onload="Wait();">
+</body>
+</html>

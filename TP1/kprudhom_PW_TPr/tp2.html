@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Déplacement carré gauche-droite </title>
+	</head>
+	<style>
+		#carre {
+			position:absolute;
+			width:200px;
+			height:200px;
+			background:red;
+		}
+	</style>
+
+	<script>
+			var intervalID;
+			var leftCtx = 10;
+		
+			function Draw() {
+				intervalID = setInterval(Move,100);
+			}
+
+			function stopMove() {
+				clearInterval(intervalID);
+			}
+		
+			function Move() {
+				var elem = document.getElementById("carre");
+				elem.style.left = leftCtx + "px";
+				leftCtx += 10;
+				if(leftCtx == 500) stopMove();
+			}
+
+	</script>
+
+<body onload="Draw();">
+	<div id="carre"></div>
+</body>
+</html>
