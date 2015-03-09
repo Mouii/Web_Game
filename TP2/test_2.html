@@ -1,0 +1,36 @@
+<html>
+	<head>
+	<link rel="stylesheet" type="text/css" href="./style.css">
+
+	</head>
+	<body>
+	<div id="carre"></div>
+	</body>
+		<script>
+		function pausecomp(millis) {
+			var date = new Date();
+			var curdate = null;
+			do {
+				curDate = new Date();
+			} while(curDate-date < millis);
+		}
+
+		var DATE = new Date();
+		var curDATE;
+		function moveElem(carre) {
+			var elem = document.getElementById(carre);
+			var left = 0;
+			var time = DATE;
+			var timer = setInterval(function() {
+				curDATE = new Date();
+				elem.style.left = (left +=10) + "px";
+				if ( left > 800 ) {
+					clearInterval(timer);
+				}
+				time = DATE - curDATE();
+			}, time);
+		}
+
+		moveElem("carre");
+		</script>
+</html>

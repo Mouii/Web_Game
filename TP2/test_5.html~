@@ -1,0 +1,30 @@
+<html>
+	<head>
+	<link rel="stylesheet" type="text/css" href="./style.css">
+
+	</head>
+	<body>
+	<div id="carre"></div>
+	</body>
+		<script>
+		window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
+                              window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+
+
+		var start = null;
+
+		var d = document.getElementById("carre");
+
+		function step(timestamp) {
+		  var progress;
+		  if (start === null) start = timestamp;
+		  progress = timestamp - start;
+		  d.style.left = progress/60 + "px";
+		  if (progress < 10000) {
+		    requestAnimationFrame(step);
+		  }
+		}
+
+		requestAnimationFrame(step);
+		</script>
+</html>

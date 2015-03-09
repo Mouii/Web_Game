@@ -1,0 +1,31 @@
+<html>
+	<head>
+	<link rel="stylesheet" type="text/css" href="./style.css">
+	</head>
+	<body>
+	<div id="carre"></div>
+	</body>
+		<script>
+
+		var elem = document.getElementById("carre");
+		var left = 0;
+
+		function animLoop(render, element) {
+			var running = new Date(); 
+			var lastFrame = new Date();
+			var raf = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame 
+				|| window.msRequestAnimationFrame || null;
+			function loop(now) {
+				raf(loop,element);
+				var deltaT = now - lastFrame;
+				if (deltaT < 160) running = render-deltaT;
+			}
+			loop(lastFrame);
+		}
+
+		animLoop(function(deltaT) {
+			elem.style.left = (left += 10 * deltaT/16) + "px";
+			if (left < 400) return false;
+		}, elem);
+		</script>
+</html>
