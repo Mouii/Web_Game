@@ -7,6 +7,7 @@
 	<div id="carre"></div>
 	</body>
 		<script>
+		//Cette fonction sert à calculer le temps de déplacement.
 		function pausecomp(millis) {
 			var date = new Date();
 			var curdate = null;
@@ -14,7 +15,8 @@
 				curDate = new Date();
 			} while(curDate-date < millis);
 		}
-
+		
+		//Cette fonction permet au carré de se déplacer
 		function moveElem(carre, time) {
 			var elem = document.getElementById(carre);
 			var left = 0;

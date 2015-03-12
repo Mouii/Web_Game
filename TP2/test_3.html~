@@ -7,6 +7,9 @@
 	<div id="carre"></div>
 	</body>
 		<script>
+		//Utilisation des fonctions requestAnimationFrame
+		
+		//Selon les ressources disponibles, le navigateur adaptera la vitesse des images
 		window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
                               window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
 
@@ -19,7 +22,7 @@
 		  var progress;
 		  if (start === null) start = timestamp;
 		  progress = timestamp - start;
-		  d.style.right = Math.min(progress/10, 200) + "px";
+		  d.style.left = Math.min(progress/10, 200) + "px";
 		  if (progress < 2000) {
 		    requestAnimationFrame(step);
 		  }

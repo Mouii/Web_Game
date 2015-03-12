@@ -7,6 +7,7 @@
 	<div id="carre"></div>
 	</body>
 		<script>
+		//test_4.html est identique à test_3.html. La différence se situe au niveau de la longueur de progression
 		window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
                               window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
 
@@ -20,7 +21,7 @@
 		  if (start === null) start = timestamp;
 		  progress = timestamp - start;
 		  d.style.left = Math.min(progress/10, 200) + "px";
-		  if (progress < 10000) {
+		  if (progress < 10000) {	//Différence située ici. Passage de 2000 -> 10000
 		    requestAnimationFrame(step);
 		  }
 		}

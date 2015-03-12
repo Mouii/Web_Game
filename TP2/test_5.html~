@@ -6,9 +6,9 @@
 	<div id="carre"></div>
 	</body>
 		<script>
+		//identique aux deux tests précédents. Cette fois, nous choisissons la vitesse de déplacement
 		window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
                               window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
-
 
 		var start = null;
 
@@ -18,7 +18,7 @@
 		  var progress;
 		  if (start === null) start = timestamp;
 		  progress = timestamp - start;
-		  d.style.left = progress/60 + "px";
+		  d.style.left = progress/60 + "px";	//Nous n'utilisons plus la fonction maths, nous divisons immédiatement par un nombre
 		  if (progress < 30000) {
 		    requestAnimationFrame(step);
 		  }

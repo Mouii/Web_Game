@@ -6,30 +6,42 @@
 	<canvas id="canvas" width="1000" height="1000"></canvas>
 	</body>
 		<script>
-
+			//Le but est d'animer une pièce
 			window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
                               window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
 
-			var img = new Image();
-			img.src = "./images/coin-sprite-animation.png";
-			img.alt = "Ouïe";
+			var img = new Image();	//Création de la variable pour l'image de la pièce
+			img.src = "./images/coin-sprite-animation.png";	//Récupération de la source
+			img.alt = "Ouïe";	//Si le chargement a été mal effectué, ce message apparaitra
 
 			var imgSrc = img.src;
 			var imgAlt = img.alt;
-			var imgNb = 0;
+			var imgNb = 0;	//Cette variable sera utile pour la découpe expliquée plus loin
 			var canvas = document.getElementById("canvas");
  			var ctx = canvas.getContext("2d");
 		
 			function stepImg() {
+			
+				/*La fonction clearRect() permet d'effacer l'image précédente dessinée par le canvas.
+				Le profil est (x, y, width, height) où x et y sont les coordonnées de départ pour l'effacement
+				et width détermine la longueur tandis que height détermine la hauteur*/
 				ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+				/* Pour animer l'image que l'on souhaite, il faut d'abord dessiner tous les états. Pour la pièce,
+				il faut dessiner la vue de face, de gauche, de droite, de derrière, de trois quarts sur chaque angle.
+				Ensuite il faut sélectionner chacune des faces en prenant soin de ne pas en prendre deux en même temps.
+				DrawImage() permet de récupérer chacune des faces et de les enchaîner à la suite.
+				Profil : DrawImage(image, découpe_x, découpe_y, découpe_longueur, découpe_largeur, dessin.x, dessin.y, dessin.longueur, dessin.hauteur)
+				Les coordonnées découpe_* concernent la capture de l'image
+				Les coordonnées dessin_* concernent l'emplacement où va dessiner ce qu'on a coupé
+				*/
 				ctx.drawImage(img,imgNb, 0, 100, 100, 10, 10, 100, 100);
-				imgNb += 100;
-				if (imgNb <= 1000) {
+				imgNb += 100;	//Incrémentation de la variable concernant la position x
+				if (imgNb <= 1000) {	//Tant qu'on est pas au bout on recommence le dessin d'une nouvelle image
 					requestAnimationFrame(stepImg);
 				} else
 				{
-					imgNb = 0;
-					ctx.clear();
+					imgNb = 0;	//Si nous sommes au bout, nous repartons au début de l'image
 					requestAnimationFrame(stepImg);
 				}
 			}

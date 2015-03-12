@@ -7,6 +7,7 @@
 	<div id="carre"></div>
 	</body>
 		<script>
+		//Cette fonction sert à calculer le temps de déplacement.
 		function pausecomp(millis) {
 			var date = new Date();
 			var curdate = null;
@@ -17,11 +18,11 @@
 
 		function moveElem(carre, time) {
 			var elem = document.getElementById(carre);
-			var right = 0;
+			var left = 0;
 			var timer = setInterval(function() {
-				elem.style.right = (right +=10) + "px";
+				elem.style.left = (left +=10) + "px";
 				pausecomp(500);
-				if ( right > 400 ) {
+				if ( left > 400 ) {
 					clearInterval(timer);
 				}
 			}, time);

@@ -7,6 +7,9 @@
 	<div id="carre"></div>
 	</body>
 		<script>
+		//Utilisation des fonctions requestAnimationFrame
+		
+		//Selon les ressources disponibles, le navigateur adaptera la vitesse des images
 		window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
                               window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
 
@@ -14,7 +17,7 @@
 		var start = null;
 
 		var d = document.getElementById("carre");
-
+		//Cette fonction permet de faire bouger le carré
 		function step(timestamp) {
 		  var progress;
 		  if (start === null) start = timestamp;

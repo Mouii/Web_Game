@@ -7,6 +7,9 @@
 	<div id="carre"></div>
 	</body>
 		<script>
+		//On effectue le même travail que test_1.html sauf que la méthode est différente
+
+
 		function pausecomp(millis) {
 			var date = new Date();
 			var curdate = null;
@@ -14,7 +17,7 @@
 				curDate = new Date();
 			} while(curDate-date < millis);
 		}
-
+		//Nous n'utilisons plus pausecomp() pour le déplacement
 		var DATE = new Date();
 		var curDATE;
 		function moveElem(carre) {
