@@ -21,9 +21,8 @@
  			var ctx = canvas.getContext("2d");
 		
 			function stepImg() {
-				ctx.save();
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
 				ctx.drawImage(img,imgNb, 0, 100, 100, 10, 10, 100, 100);
-				ctx.restore();
 				imgNb += 100;
 				if (imgNb <= 1000) {
 					requestAnimationFrame(stepImg);
