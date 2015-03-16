@@ -7,27 +7,23 @@
 	<div id="carre"></div>
 	</body>
 		<script>
-		function pausecomp(millis) {
-			var date = new Date();
-			var curdate = null;
-			do {
-				curDate = new Date();
-			} while(curDate-date < millis);
-		}
-
+		//On effectue le même travail que test_1.html sauf que la méthode est différente
+		//Nous n'utilisons plus pausecomp() pour le déplacement
 		var DATE = new Date();
 		var curDATE;
+		var left = 0;
 		function moveElem(carre) {
+			var time;
 			var elem = document.getElementById(carre);
-			var left = 0;
-			var time = DATE;
+			if (left == 0) time = 1;
+			else time = DATE;
 			var timer = setInterval(function() {
 				curDATE = new Date();
 				elem.style.left = (left +=10) + "px";
 				if ( left > 800 ) {
 					clearInterval(timer);
 				}
-				time = DATE - curDATE();
+				time = DATE - curDATE;
 			}, time);
 		}
 
