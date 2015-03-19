@@ -10,8 +10,8 @@
 <script type='text/javascript'>
 	//Tutorial game html5 and javascript
 	
-	var CANVAS_WIDTH = 500;	 	//This variable will be use for the canvas width
-	var CANVAS_HEIGHT = 300;	//This one will be for the height
+	var CANVAS_WIDTH = 700;	 	//This variable will be use for the canvas width
+	var CANVAS_HEIGHT = 400;	//This one will be for the height
 	
 	var image = new Image();
 	image.src = "hero.png";	//Selection of the source of the image
@@ -81,6 +81,7 @@
        			moving = 0;
        		}
        		player.x -= 5;
+       		if ((player.x + 37) < 0) player.x = -37;
        		moving += 128;
        		moving %= 512;	
 	}
@@ -91,6 +92,7 @@
        			moving = 0;
        		}
         	player.y -= 5;
+        	if ((player.y + 7) < 0) player.y = -7;
         	moving += 128;
        		moving %= 512;
 	}
@@ -100,7 +102,8 @@
        			player.move = rightMove;
        			moving = 0;
        		}
-       		player.x += 5;
+       		player.x += 10;
+       		if ((player.x + 88) > CANVAS_WIDTH) player.x = CANVAS_WIDTH - 88;
        		moving += 128;
        		moving %= 512;		
 	}
@@ -111,6 +114,7 @@
        			moving = 0;
        		}
         	player.y += 5;
+        	if ((player.y + 128) > CANVAS_HEIGHT) player.y = CANVAS_HEIGHT - 128;
         	moving += 128;
        		moving %= 512;	
 	}
@@ -186,9 +190,6 @@
 		var bRect = theCanvas.getBoundingClientRect();
 		mouseX = (evt.clientX - bRect.left)*(theCanvas.width/bRect.width);
 		mouseY = (evt.clientY - bRect.top)*(theCanvas.height/bRect.height);
-		
-		console.log("X : " + mouseX + " Y: " + mouseY);
-		console.log("player x : " + player.x + " player y : " + player.y);
 		
 		if ((player.x + 62) < mouseX) {
 			requestAnimationFrame(moveToRightMouse);
