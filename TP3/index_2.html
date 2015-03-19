@@ -40,8 +40,8 @@
 	
 	//The player variable is an object which contains all the data about the hero we want to move
 	var player = {
-		x: 100,			//Its position in x
-		y: 100,			//The position in y
+		x: 0,			//Its position in x
+		y: 0,			//The position in y
 		move : rightMove,	//The actual move status : if he's on the right, left, up or down
 		draw: function() {	//The principal function which redraw the hero with all the updates
 			canvas.drawImage(image, moving, this.move, 128, 128, this.x, this.y,128,128);//Function drawing the basic picture
@@ -125,42 +125,10 @@
 			player.x -= 5;
 	       		moving += 128;
 	       		moving %= 512;	
-			if((player.x +62) > mouseX) {
+			if((player.x + 62) > mouseX) {
 				requestAnimationFrame(moveToLeftMouse);
 			} else {
-				if (player.y < mouseY) {
-					requestAnimationFrame(moveToDownMouse);
-				} else {
-					requestAnimationFrame(moveToUpMouse);
-				}
-			}
-	}
-	
-	function moveToDownMouse() {
-       		if (player.move != downMove) {
-       			player.move = downMove;
-       			moving = 0;
-       		}
-			player.y += 5;
-	       		moving += 128;
-	       		moving %= 512;	
-			if((player.y + 120) < mouseY) {
-				requestAnimationFrame(moveToDownMouse);
-			}
-	}
-	
-	function moveToRightMouse() {
-       		if (player.move != rightMove) {
-       			player.move = rightMove;
-       			moving = 0;
-       		}
-			player.x += 5;
-	       		moving += 128;
-	       		moving %= 512;	
-			if((player.x +62) < mouseX) {
-				requestAnimationFrame(moveToRightMouse);
-			} else {
-				if (player.y < mouseY) {
+				if ((player.y + 120) < mouseY) {
 					requestAnimationFrame(moveToDownMouse);
 				} else {
 					requestAnimationFrame(moveToUpMouse);
@@ -180,6 +148,38 @@
 				requestAnimationFrame(moveToUpMouse);
 			}
 	}
+	
+	function moveToRightMouse() {
+       		if (player.move != rightMove) {
+       			player.move = rightMove;
+       			moving = 0;
+       		}
+			player.x += 5;
+	       		moving += 128;
+	       		moving %= 512;	
+			if((player.x + 62) < mouseX) {
+				requestAnimationFrame(moveToRightMouse);
+			} else {
+				if ((player.y + 120) < mouseY) {
+					requestAnimationFrame(moveToDownMouse);
+				} else {
+					requestAnimationFrame(moveToUpMouse);
+				}
+			}
+	}
+	
+	function moveToDownMouse() {
+       		if (player.move != downMove) {
+       			player.move = downMove;
+       			moving = 0;
+       		}
+			player.y += 5;
+	       		moving += 128;
+	       		moving %= 512;	
+			if((player.y + 120) < mouseY) {
+				requestAnimationFrame(moveToDownMouse);
+			}
+	}
 
 	theCanvas.addEventListener("mousedown", function (evt) {
 	
@@ -187,7 +187,7 @@
 		mouseX = (evt.clientX - bRect.left)*(theCanvas.width/bRect.width);
 		mouseY = (evt.clientY - bRect.top)*(theCanvas.height/bRect.height);
 		
-		if (player.x < mouseX) {
+		if ((player.x + 62) < mouseX) {
 			requestAnimationFrame(moveToRightMouse);
 		} else {
 			requestAnimationFrame(moveToLeftMouse);
