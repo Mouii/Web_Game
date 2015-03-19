@@ -130,7 +130,11 @@
 			if((player.x +62) > mouseX) {
 				requestAnimationFrame(moveToLeftMouse);
 			} else {
-				Xoff = true;
+				if (player.y < mouseY) {
+					requestAnimationFrame(moveToDownMouse);
+				} else {
+					requestAnimationFrame(moveToUpMouse);
+				}
 			}
 	}
 	
@@ -144,8 +148,6 @@
 	       		moving %= 512;	
 			if((player.y + 120) < mouseY) {
 				requestAnimationFrame(moveToDownMouse);
-			} else {
-				Xoff = false;
 			}
 	}
 	
@@ -160,7 +162,11 @@
 			if((player.x +62) < mouseX) {
 				requestAnimationFrame(moveToRightMouse);
 			} else {
-				Xoff = true;
+				if (player.y < mouseY) {
+					requestAnimationFrame(moveToDownMouse);
+				} else {
+					requestAnimationFrame(moveToUpMouse);
+				}
 			}
 	}
 	
@@ -174,8 +180,6 @@
 	       		moving %= 512;	
 			if((player.y + 120) > mouseY) {
 				requestAnimationFrame(moveToUpMouse);
-			} else {
-				Xoff = false;
 			}
 	}
 
@@ -189,17 +193,8 @@
 			requestAnimationFrame(moveToRightMouse);
 		} else {
 			requestAnimationFrame(moveToLeftMouse);
-		}
-		
-		while(!Xoff){
-			console.log("waiting");
-		}
-		if (player.y < mouseY) {
-			requestAnimationFrame(moveToDownMouse);
-		} else {
-			requestAnimationFrame(moveToUpMouse);
-		}
-		
+		}	
+			
 	}, false);
 
 
