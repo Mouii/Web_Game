@@ -10,36 +10,42 @@
 <script type='text/javascript'>
 	//Tutorial game html5 and javascript
 	
-	var CANVAS_WIDTH = 500;
-	var CANVAS_HEIGHT = 300;
+	var CANVAS_WIDTH = 500;	 	//This variable will be use for the canvas width
+	var CANVAS_HEIGHT = 300;	//This one will be for the height
 	
 	var image = new Image();
-	image.src = "hero.png";//Selection of the source of the image
-	image.alt = "Outch";//if there is any problem, this message will be displayed	
+	image.src = "hero.png";	//Selection of the source of the image
+	image.alt = "Outch";	//if there is any problem, this message will be displayed	
 
-	var canvasElement = document.createElement("canvas");
-	var canvas = canvasElement.getContext("2d");
-	canvasElement.id = "canvas";
-	canvasElement.width = CANVAS_WIDTH;
-	canvasElement.height = CANVAS_HEIGHT;
+	var canvasElement = document.createElement("canvas");	//Creation of a canvas
+	var canvas = canvasElement.getContext("2d");		//This is the context
+	canvasElement.id = "canvas";				//The id of the canvas
+	canvasElement.width = CANVAS_WIDTH;			//Its width
+	canvasElement.height = CANVAS_HEIGHT;			//Its height
 	canvasElement.setAttribute('tabindex','1');
 	canvasElement.focus();
 	var theCanvas = document.body.appendChild(canvasElement);
 	
-	var moving = 0;//moving will be use for the cutting from the image
+	var moving = 0;	//moving will be use for the cutting from the image
 	
-	var leftMove = 0;
-	var rightMove = 128;
-	var upMove = 384;
-	var downMove = 256;
+	//All the 4 following variables will be us for the cutting on the picture owning all the sprites
+	var leftMove = 0;		//For the left moves
+	var rightMove = 128;		//The right ones
+	var upMove = 384;		//The up
+	var downMove = 256;		//The down
 	
-		var player = {
-		x: 100,
-		y: 100,
-		width: 32,
-		height: 32,
-		move : rightMove,
-		draw: function() {
+	//The following variables will print the mouse position onclick
+	var mouseX = 0;
+	var mouseY = 0;
+	
+	var Xoff = false; //This variable will be use for the movement in mouse in order to move on the X first then on the Y
+	
+	//The player variable is an object which contains all the data about the hero we want to move
+	var player = {
+		x: 100,			//Its position in x
+		y: 100,			//The position in y
+		move : rightMove,	//The actual move status : if he's on the right, left, up or down
+		draw: function() {	//The principal function which redraw the hero with all the updates
 			canvas.drawImage(image, moving, this.move, 128, 128, this.x, this.y,128,128);//Function drawing the basic picture
 		}
 	};
@@ -48,48 +54,150 @@
 	window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
                               window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
 	
+	//Listener added in order to execute actions depending the key pressed
 	theCanvas.addEventListener("keydown", function (e) {
 		var code = e.keyCode;
     		switch (code) {
        			case 37:  //Left key
-       			       	if (player.move != leftMove) {
-       					player.move = leftMove;
-       					moving = 0;
-       				}
-       				player.x -= 5;
-       				moving += 128;
-       				moving = moving%512;
+				moveToLeft();
        				break;
         		case 38: //Up key
-       				if (player.move != upMove) {
-       					player.move = upMove;
-       					moving = 0;
-       				}
-        			player.y -= 5;
-        			moving += 128;
-       				moving = moving%512;
+				moveToUp();
         			break; 
        			case 39: //Right key
-       				if (player.move != rightMove) {
-       					player.move = rightMove;
-       					moving = 0;
-       				}
-       				player.x += 5;
-       				moving += 128;
-       				moving = moving%512;
+       				moveToRight()
        				break;
         		case 40: //Down key
-              			if (player.move != downMove) {
-       					player.move = downMove;
-       					moving = 0;
-       				}
-        			player.y += 5;
-        	       		moving += 128;
-       				moving = moving%512;
+				moveToDown();
         			break; 
         		default: 
         			break; //Everything else
    		}
+	}, false);
+
+	//The actions about the moves are describes here
+	
+	function moveToLeft() {
+       		if (player.move != leftMove) {
+       			player.move = leftMove;
+       			moving = 0;
+       		}
+       		player.x -= 5;
+       		moving += 128;
+       		moving %= 512;	
+	}
+	
+	function moveToUp() {
+	       	if (player.move != upMove) {
+       			player.move = upMove;
+       			moving = 0;
+       		}
+        	player.y -= 5;
+        	moving += 128;
+       		moving %= 512;
+	}
+	
+	function moveToRight() {
+       		if (player.move != rightMove) {
+       			player.move = rightMove;
+       			moving = 0;
+       		}
+       		player.x += 5;
+       		moving += 128;
+       		moving %= 512;		
+	}
+
+	function moveToDown() {
+              	if (player.move != downMove) {
+       			player.move = downMove;
+       			moving = 0;
+       		}
+        	player.y += 5;
+        	moving += 128;
+       		moving %= 512;	
+	}
+
+	//Duplication of the moving function for the mouse
+	
+	function moveToLeftMouse() {
+       		if (player.move != leftMove) {
+       			player.move = leftMove;
+       			moving = 0;
+       		}
+			player.x -= 5;
+	       		moving += 128;
+	       		moving %= 512;	
+			if((player.x +62) > mouseX) {
+				requestAnimationFrame(moveToLeftMouse);
+			} else {
+				Xoff = true;
+			}
+	}
+	
+	function moveToDownMouse() {
+       		if (player.move != downMove) {
+       			player.move = downMove;
+       			moving = 0;
+       		}
+			player.y += 5;
+	       		moving += 128;
+	       		moving %= 512;	
+			if((player.y + 120) < mouseY) {
+				requestAnimationFrame(moveToDownMouse);
+			} else {
+				Xoff = false;
+			}
+	}
+	
+	function moveToRightMouse() {
+       		if (player.move != rightMove) {
+       			player.move = rightMove;
+       			moving = 0;
+       		}
+			player.x += 5;
+	       		moving += 128;
+	       		moving %= 512;	
+			if((player.x +62) < mouseX) {
+				requestAnimationFrame(moveToRightMouse);
+			} else {
+				Xoff = true;
+			}
+	}
+	
+	function moveToUpMouse() {
+       		if (player.move != upMove) {
+       			player.move = upMove;
+       			moving = 0;
+       		}
+			player.y -= 5;
+	       		moving += 128;
+	       		moving %= 512;	
+			if((player.y + 120) > mouseY) {
+				requestAnimationFrame(moveToUpMouse);
+			} else {
+				Xoff = false;
+			}
+	}
+
+	theCanvas.addEventListener("mousedown", function (evt) {
+	
+		var bRect = theCanvas.getBoundingClientRect();
+		mouseX = (evt.clientX - bRect.left)*(theCanvas.width/bRect.width);
+		mouseY = (evt.clientY - bRect.top)*(theCanvas.height/bRect.height);
+		
+		if (player.x < mouseX) {
+			requestAnimationFrame(moveToRightMouse);
+		} else {
+			requestAnimationFrame(moveToLeftMouse);
+		}
+		
+		
+		if (player.y < mouseY) {
+			requestAnimationFrame(moveToDownMouse);
+		} else {
+			requestAnimationFrame(moveToUpMouse);
+		}
+		
 	}, false);
 
 
@@ -102,104 +210,7 @@
 		requestAnimationFrame(draw);
 	}
 
-	requestAnimationFrame(draw);
-
-	//This variable is needed for the animation Frame
-	/*window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
-                              window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
-
-	var canvas = document.getElementById("testing");//We pick up the canvas
-     	var context = canvas.getContext("2d");//This variable picks up the context which allow us to custom the canvas
-	var image = new Image();
-	image.src = "hero.png";//Selection of the source of the image
-	image.alt = "Outch";//if there is any problem, this message will be displayed
-
-	var cursorImg = 0;//This variable will be important for the selection of the sprite
-
-	context.drawImage(image, 0, 128, 128, 128, 150,150,128,128);//Function drawing the basic picture
-	
-	var orientation = "RIGHT";//This is the default direction of the sprite
-	var moving = 128;//moving will be use for the cutting from the image
-	var changing = false;//If there is a change of orientation, this value will be true
-	var moveX = 250;
-	var moveY = 250;*/
-		
-
-	//Listener added in order to execute actions depending the key pressed
-	/*canvas.addEventListener("keydown", function (event) {
-		console.log("MOVE?");
-		if (!event.defaultPrevented) {
-			switch (event.key) {
-				case 40:
-					
-					if (orientation != "DOWN") {
-						changing = true;
-						orientation = "DOWN";
-					}
-				
-				break;
-				case 38:
-					if (orientation != "UP") {
-					changing = true;
-					orientation = "UP";
-					}
-				
-				break;
-				case 37:
-					if (orientation != "LEFT") {
-					changing = true; 
-					orientation = "LEFT";
-					}
-				
-				break;				
-				case 39:
-					console.log("move RIGHT");
-					if (orientation != "RIGHT") {
-					changing = true;
-					orientation = "RIGHT";
-					}
-					requestAnimationFrame(stepImg);
-				break;
-				
-				default:
-				break;
-			}
-		}
-	}, false);
-
-	
-
-	function stepImg() {
-		context.clearRect(0,0,canvas.width,canvas.height);
-		if (changing) {
-			moving = 0;
-			changing = false;
-		}
-		switch (orientation) {
-			case "DOWN":
-				//context.drawImage(image,moving,
-			break;
-			case "UP":
-			
-			break;
-			case "LEFT":
-			
-			break;
-			case "RIGHT":
-			moveX += 20;
-				context.drawImage(image, moving, 128, 128, 128, moveX,128,128,128);
-				moving += 128;
-			break;
-			default:
-			
-			break;
-		}
-		if (moving < 512) requestAnimationFrame(stepImg);
-		else {
-			moving = 0;
-			requestAnimationFrame(stepImg);
-		}
-	}*/
-
-
+window.addEventListener("load", function(){
+  draw();
+});
     </script>
