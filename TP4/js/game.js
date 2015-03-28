@@ -200,7 +200,7 @@ function Enemy(X, Y, xSpeed, ySpeed, level) {
 	this.shoot = function() {
 		this.cptShoot = (this.cptShoot+10)%2000;
 		if (this.cptShoot == 10) {
-			enemyShot = new enemyMissile(this);
+			enemyShot = new enemyMissile(this, this.level);
 			tabEnemyMissile.unshift(enemyShot);
 		}
 	
@@ -209,12 +209,13 @@ function Enemy(X, Y, xSpeed, ySpeed, level) {
 //Enemies's shots
 var tabEnemyMissile = new Array();
 
-function enemyMissile(Enemy) {
+function enemyMissile(Enemy, level) {
 	this.x = Enemy.x + (Enemy.imgWidth)/2;
 	this.y = Enemy.y + ((Enemy.imgHeight)/2);
 	this.speed = 5;
 	this.width = 8;
 	this.height = 4;
+	this.level = level;
 	if (this.y > player.y ) {
 		this.direction = 1;
 	} else if (this.y < player.y) {
@@ -230,6 +231,24 @@ function enemyMissile(Enemy) {
 		conArena.drawImage(imgMissile, 0, 0, this.width, this.height, this.x, this.y, this.width, this.height);
 	};
 	this.update = function() {
+		switch (this.level) {
+			case 1:
+				this.updatelvl1();
+				break;
+			case 2:
+			
+				break;
+			case 3:
+				
+				break;	
+			case 4: 
+			
+				break;
+			default:
+				break;
+		}
+	};
+	this.updatelvl1 = function() {
 		this.x -= this.speed;
 		switch (this.direction) {
 			case (-1):
@@ -241,11 +260,31 @@ function enemyMissile(Enemy) {
 			default:
 				break;
 		}
-		
 	}
 };
 
+var gameTime = {
+	ms : 0,
+	s : 0,
+	m : 0,
+	h : 0,
+	add : function() {
+		this.ms += 1;
+		if (this.ms == 60) {
+			this.ms = 0;
+			this.s += 1;
+		}
+		if (this.s == 60) {
+			this.s = 0;
+			this.m += 1;
+		}
+		if (this.m == 60) {
+			this.m = 0;
+			this.h += 1;
+		}
+	}
 
+};
 
 /////////////////////////////////
 
@@ -270,6 +309,11 @@ function updateItems() {
     });
     
 }
+
+function updateTime() {
+	gameTime.add();
+}
+
 function drawScene() {
     "use strict"; 
     canArena.style.backgroundPosition = xBackgroundOffset + "px 0px" ;
@@ -317,6 +361,7 @@ function updateGame() {
     "use strict"; 
     updateScene();
     updateItems();
+    setTimeout(updateTime, 1000);
 }
 
 function drawGame() {
