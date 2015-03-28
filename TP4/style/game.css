@@ -1,0 +1,7 @@
+#canArena {
+    border-style: solid; 
+    border-width: 2px; 
+    width: 700px;
+    height: 400px;
+    background: url(../assets/Backgrounds/farback.gif);
+}
