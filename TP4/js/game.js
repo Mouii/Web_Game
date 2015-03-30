@@ -133,6 +133,14 @@ function missile() {
 	};
 	this.update = function() {
 		this.x += this.speed;
+	};
+	this.collision = function(enemy) {
+		if (this.x + this.width >= enemy.x && this.y > enemy.y && this.y < enemy.y + enemy.height) {
+			console.log("boom");
+			enemy.explosion();
+			conArena.clearRect(this.x, this.y, this.width, this.height+1);
+			tabProjectile.pop();
+		}
 	}
 };
 
@@ -145,6 +153,9 @@ imgEnemyLvl1.src = "./assets/Enemy/lvl1Enemy.png";
 imgEnemyLvl2.src = "./assets/Enemy/lvl2Enemy.png";
 imgEnemyLvl3.src = "./assets/Enemy/lvl3Enemy.png";
 imgEnemyLvl4.src = "./assets/Enemy/lvl4Enemy.png";
+
+var imgExplosion = new Image();
+imgExplosion.src = "./assets/explosion.png";
 
 var enemy;
 
@@ -163,6 +174,8 @@ function Enemy(X, Y, xSpeed, ySpeed, level) {
 	this.imgHeight = 15;
 	this.imgWidth = 20;
 	this.cptShoot = 0;
+	this.imgExplosion = 0;
+	this.alive = 0;
 	this.tabEnemyMissile = new Array();
 	switch (level) {
 		case 2 :
@@ -180,7 +193,17 @@ function Enemy(X, Y, xSpeed, ySpeed, level) {
 	}
 	this.draw = function() {
 		animEnemy = (animEnemy+30)%180;
-		conArena.drawImage(this.image, 0, animEnemy, this.width, this.height, this.x, this.y, this.imgWidth, this.imgHeight);
+		if (this.alive == 1) {
+			this.image = imgExplosion;
+			conArena.drawImage(this.image, this.imgExplosion, 0, 64, 64, this.x, this.y, this.imgWidth, this.imgHeight);
+			this.imgExplosion += 64;
+			if (this.explosion == 640) {
+				this.explosion = 0;
+				this.alive = -1;
+			}
+		} else if (this.alive == 0) {
+			conArena.drawImage(this.image, 0, animEnemy, this.width, this.height, this.x, this.y, this.imgWidth, this.imgHeight);
+		}
 		this.tabEnemyMissile.map(function(object) {
     			object.draw();
     		});
@@ -195,13 +218,10 @@ function Enemy(X, Y, xSpeed, ySpeed, level) {
     			}  
    		});
 	};
-	this.clearDead = function() {
-		conArena.drawImage(this.image, 0, 0, 1, 1, this.x, this.y, this.imgWidth, this.imgHeight);
-	}
 	this.update = function() {
 		this.x += this.xSpeed;
 		this.y += this.ySpeed;
-		this.shoot();
+		if (this.alive == 0) this.shoot();
 		this.tabEnemyMissile.map(function(object) {
     			object.update();
    		});
@@ -214,7 +234,12 @@ function Enemy(X, Y, xSpeed, ySpeed, level) {
 			(this.tabEnemyMissile).unshift(enemyShot);
 		}
 	
-	}
+	};
+	this.explosion = function() {
+		this.xSpeed = 0;
+		this.ySpeed = 0;
+		this.alive = 1;
+	};
 };
 //Enemies's shots 
 function enemyMissile(Enemy, level) {
@@ -315,8 +340,11 @@ function updateItems() {
     "use strict"; 
     clearItems();
     player.update();
-    tabProjectile.map(function(object) {
-    	object.update();
+    tabProjectile.map(function(missile) {
+    	missile.update();
+    	tabEnemy.map(function(object) {
+    		missile.collision(object);
+    	});
     }); 
     tabEnemy.map(function(object) {
     	object.update();
@@ -357,7 +385,7 @@ function clearItems() {
     });
     tabEnemy.map(function(object,index,array) {
     	object.clear();
-	if (object.y >= ArenaHeight || object.x <= 0) {
+	if (object.y >= ArenaHeight || object.x <= 0 || object.alive == -1) {
     		delete array[index];
     		array.splice(index,1);
     		if (array[index] != null) array[index].clear();	//To make sure there is no drawing error
