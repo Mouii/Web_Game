@@ -25,8 +25,7 @@ var keys = {
     UP: 38,
     DOWN: 40,
     SPACE: 32,
-    ENTER: 13,
-    A : 65
+    ENTER: 13
 };
 
 var keyStatus = {};
@@ -96,12 +95,7 @@ var player = {
                     			projectile = new missile();
                     			tabProjectile.unshift(projectile);
                 		}
-                		if (keycode == keys.A) {
-                			enemy = new Enemy(400, 0, -1, 1, 1);
-                			enemy1 = new Enemy(400, 300, -1, -1, 1);
-                			tabEnemy.unshift(enemy);
-                			tabEnemy.unshift(enemy1);
-                		}            
+     
             		}	
         		keyStatus[keycode] = false;
    		}
@@ -273,6 +267,7 @@ var gameTime = {
 		if (this.ms == 60) {
 			this.ms = 0;
 			this.s += 1;
+			spawningEnemies();
 		}
 		if (this.s == 60) {
 			this.s = 0;
@@ -286,6 +281,14 @@ var gameTime = {
 
 };
 
+function spawningEnemies() {
+	var xSpawn = Math.floor((Math.random() * 100) + 200);
+	var xSpawnSpeed = Math.floor((Math.random() * -10) + 1)/4;
+	var ySpawnSpeed = Math.floor((Math.random() * 10) + 1)/4;
+	enemy = new Enemy(xSpawn, 0, xSpawnSpeed, ySpawnSpeed, 1);
+	tabEnemy.unshift(enemy);
+
+}
 /////////////////////////////////
 
 
