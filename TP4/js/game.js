@@ -152,8 +152,6 @@ var animEnemy = 0;
 
 var tabEnemy = new Array();
 
-var enemyShot;
-
 function Enemy(X, Y, xSpeed, ySpeed, level) {
 	this.x = X;	
 	this.y = Y;
@@ -165,6 +163,7 @@ function Enemy(X, Y, xSpeed, ySpeed, level) {
 	this.imgHeight = 15;
 	this.imgWidth = 20;
 	this.cptShoot = 0;
+	this.tabEnemyMissile = new Array();
 	switch (level) {
 		case 2 :
 			this.image = imgEnemyLvl2;
@@ -182,27 +181,42 @@ function Enemy(X, Y, xSpeed, ySpeed, level) {
 	this.draw = function() {
 		animEnemy = (animEnemy+30)%180;
 		conArena.drawImage(this.image, 0, animEnemy, this.width, this.height, this.x, this.y, this.imgWidth, this.imgHeight);
+		this.tabEnemyMissile.map(function(object) {
+    			object.draw();
+    		});
 	};
 	this.clear = function() {
-		conArena.clearRect(this.x, this.y, this.width, this.height);	
+		conArena.clearRect(this.x, this.y, this.width, this.height);
+		this.tabEnemyMissile.map(function(object,index,array) {
+    			object.clear();
+			if (object.y >= ArenaHeight || object.x <= 0) {
+    				delete array[index];
+    				array.splice(index,1);
+    			}  
+   		});
 	};
+	this.clearDead = function() {
+		conArena.drawImage(this.image, 0, 0, 1, 1, this.x, this.y, this.imgWidth, this.imgHeight);
+	}
 	this.update = function() {
 		this.x += this.xSpeed;
 		this.y += this.ySpeed;
 		this.shoot();
+		this.tabEnemyMissile.map(function(object) {
+    			object.update();
+   		});
 	};
 	this.shoot = function() {
 		this.cptShoot = (this.cptShoot+10)%2000;
 		if (this.cptShoot == 10) {
+			var enemyShot;
 			enemyShot = new enemyMissile(this, this.level);
-			tabEnemyMissile.unshift(enemyShot);
+			(this.tabEnemyMissile).unshift(enemyShot);
 		}
 	
 	}
 };
-//Enemies's shots
-var tabEnemyMissile = new Array();
-
+//Enemies's shots 
 function enemyMissile(Enemy, level) {
 	this.x = Enemy.x + (Enemy.imgWidth)/2;
 	this.y = Enemy.y + ((Enemy.imgHeight)/2);
@@ -219,7 +233,7 @@ function enemyMissile(Enemy, level) {
 		this.direction = 0;
 	}
 	this.clear = function() {
-		conArena.clearRect(this.x, this.y, this.width, this.height+1);
+		conArena.clearRect(this.x-10, this.y-10, this.width+20, this.height+20);
 	};
 	this.draw = function() {
 		conArena.drawImage(imgMissile, 0, 0, this.width, this.height, this.x, this.y, this.width, this.height);
@@ -246,10 +260,10 @@ function enemyMissile(Enemy, level) {
 		this.x -= this.speed;
 		switch (this.direction) {
 			case (-1):
-				this.y += this.speed;
+				this.y += this.speed/5;
 				break;
 			case 1 :
-				this.y -= this.speed;
+				this.y -= this.speed/5;
 				break;
 			default:
 				break;
@@ -267,7 +281,7 @@ var gameTime = {
 		if (this.ms == 60) {
 			this.ms = 0;
 			this.s += 1;
-			spawningEnemies();
+			if (this.s%2 == 0) spawningEnemies();
 		}
 		if (this.s == 60) {
 			this.s = 0;
@@ -282,11 +296,11 @@ var gameTime = {
 };
 
 function spawningEnemies() {
-	var xSpawn = Math.floor((Math.random() * 100) + 200);
+	var sideSpawn = Math.floor((Math.random() * 100));
 	var xSpawnSpeed = Math.floor((Math.random() * -10) + 1)/4;
-	var ySpawnSpeed = Math.floor((Math.random() * 10) + 1)/4;
-	enemy = new Enemy(xSpawn, 0, xSpawnSpeed, ySpawnSpeed, 1);
-	tabEnemy.unshift(enemy);
+	var ySpawnSpeed = Math.floor((Math.random() * 2) + 1)/4;
+	enemy = new Enemy(ArenaWidth, sideSpawn, xSpawnSpeed, ySpawnSpeed, 1);
+	tabEnemy.push(enemy);
 
 }
 /////////////////////////////////
@@ -307,9 +321,7 @@ function updateItems() {
     tabEnemy.map(function(object) {
     	object.update();
     });
-    tabEnemyMissile.map(function(object) {
-    	object.update();
-    });
+    updateTime();
     
 }
 
@@ -330,9 +342,6 @@ function drawItems() {
     tabEnemy.map(function(object) {
     	object.draw();
     });
-    tabEnemyMissile.map(function(object) {
-    	object.draw();
-    });
 }
 
 var i;
@@ -346,25 +355,21 @@ function clearItems() {
     		tabProjectile.pop();
     	};
     });
-    tabEnemy.map(function(enemy) {
-    	enemy.clear();
-    	if (enemy.y > ArenaHeight || enemy.y < 0) {
-    		tabEnemy.pop();
-    	}
-    });
-    tabEnemyMissile.map(function(object) {
+    tabEnemy.map(function(object,index,array) {
     	object.clear();
-    	if (object.x < 0) {
-    		tabEnemyMissile.pop();
-    	};
-    }); 
+	if (object.y >= ArenaHeight || object.x <= 0) {
+    		delete array[index];
+    		array.splice(index,1);
+    		if (array[index] != null) array[index].clear();	//To make sure there is no drawing error
+    	}  
+    });
+    
 }
 
 function updateGame() {
     "use strict"; 
     updateScene();
     updateItems();
-    setTimeout(updateTime, 1000);
 }
 
 function drawGame() {
