@@ -59,7 +59,9 @@ function keyUpHandler(event) {
 var imgPlayer = new Image();
 imgPlayer.src = "./assets/Ship/vaisseau.png";
 
-var animNumber = 0;
+var tabImgPlayer = new Array();
+var tabImgEnemy = new Array();
+var tabImgExplosion = new Array();
 
 var player = {
 	x: 20,
@@ -67,19 +69,21 @@ var player = {
 	speed : 10,
 	height : 15,
 	width : 32,
-	imgHeight : 28,
-	imgWidth : 64,
-	anim : animNumber,
+	//imgHeight : 28,
+	//imgWidth : 64,
+	anim : 0,
 	nbLives : 3,
-	collision : false,
+	score : 0,
 	draw : function() {
-		animNumber = (animNumber+29)%116;
-		conArena.drawImage(imgPlayer, 0, animNumber, this.imgWidth, this.imgHeight, this.x, this.y, this.width, this.height);
+		//this.anim = (this.anim + 29)%116;
+		//conArena.drawImage(imgPlayer, 0, this.anim, this.imgWidth, this.imgHeight, this.x, this.y, this.width, this.height);
+		conArena.drawImage(tabImgPlayer[this.anim],this.x, this.y);
 	},
 	clear : function() {
 		conArena.clearRect(this.x, this.y, this.width, this.height);	
 	},
 	update : function() {
+		this.anim = (this.anim + 1)%4;
 		var keycode;
     		for (keycode in keyStatus) {
             		if (keyStatus[keycode] == true){
@@ -101,13 +105,16 @@ var player = {
    		}
 	},
 	lostLife : function() {
-		--nbLives;
+		--this.nbLives;
 	},
 	winLife : function() {
-		++nbLives;
+		++this.nbLives;
+	},
+	scoring : function() {
+		this.score++;
 	},
 	explosion : function() {
-	
+		
 	}
 };
 
@@ -120,7 +127,7 @@ var projectile;
 var tabProjectile = new Array();
 
 function missile() {
-	this.x = player.x;
+	this.x = player.x + player.width;
 	this.y = player.y + ((player.height)/2);
 	this.speed = 10;
 	this.width = 8;
@@ -136,7 +143,7 @@ function missile() {
 	};
 	this.collision = function(enemy) {
 		if (this.x + this.width >= enemy.x && this.y > enemy.y && this.y < enemy.y + enemy.height) {
-			console.log("boom");
+			player.scoring();
 			enemy.explosion();
 			conArena.clearRect(this.x, this.y, this.width, this.height+1);
 			tabProjectile.pop();
@@ -159,8 +166,6 @@ imgExplosion.src = "./assets/explosion.png";
 
 var enemy;
 
-var animEnemy = 0;
-
 var tabEnemy = new Array();
 
 function Enemy(X, Y, xSpeed, ySpeed, level) {
@@ -173,9 +178,10 @@ function Enemy(X, Y, xSpeed, ySpeed, level) {
 	this.width = 40;
 	this.imgHeight = 15;
 	this.imgWidth = 20;
+	this.anim = 0;
 	this.cptShoot = 0;
 	this.imgExplosion = 0;
-	this.alive = 0;
+	this.alive = 1;
 	this.tabEnemyMissile = new Array();
 	switch (level) {
 		case 2 :
@@ -192,24 +198,27 @@ function Enemy(X, Y, xSpeed, ySpeed, level) {
 			break;
 	}
 	this.draw = function() {
-		animEnemy = (animEnemy+30)%180;
-		if (this.alive == 1) {
-			this.image = imgExplosion;
-			conArena.drawImage(this.image, this.imgExplosion, 0, 64, 64, this.x, this.y, this.imgWidth, this.imgHeight);
-			this.imgExplosion += 64;
-			if (this.explosion == 640) {
+		//this.anim = (this.anim+30)%180;
+		if (this.alive == 0) {
+			//this.image = imgExplosion;
+			//conArena.drawImage(this.image, this.imgExplosion, 0, 64, 64, this.x, this.y, this.imgWidth, this.imgHeight);
+			conArena.drawImage(tabImgExplosion[this.anim],this.x, this.y);
+			//this.imgExplosion += 64;
+			//if (this.imgExplosion == 640) {
+			if (this.anim == 9) {
 				this.explosion = 0;
 				this.alive = -1;
 			}
-		} else if (this.alive == 0) {
-			conArena.drawImage(this.image, 0, animEnemy, this.width, this.height, this.x, this.y, this.imgWidth, this.imgHeight);
+		} else if (this.alive == 1) {
+			//conArena.drawImage(this.image, 0, this.anim, this.width, this.height, this.x, this.y, this.imgWidth, this.imgHeight);
+			conArena.drawImage(tabImgEnemy[this.anim],this.x, this.y);
 		}
 		this.tabEnemyMissile.map(function(object) {
     			object.draw();
     		});
 	};
 	this.clear = function() {
-		conArena.clearRect(this.x, this.y, this.width, this.height);
+		conArena.clearRect(this.x, this.y-1, this.width, this.height+1);
 		this.tabEnemyMissile.map(function(object,index,array) {
     			object.clear();
 			if (object.y >= ArenaHeight || object.x <= 0) {
@@ -219,9 +228,15 @@ function Enemy(X, Y, xSpeed, ySpeed, level) {
    		});
 	};
 	this.update = function() {
+		if (this.alive == 0) {
+			this.anim = (this.anim + 1) % 10;
+		}
 		this.x += this.xSpeed;
 		this.y += this.ySpeed;
-		if (this.alive == 0) this.shoot();
+		if (this.alive == 1) {
+			this.anim = (this.anim +1) % 6;
+			this.shoot();
+		}
 		this.tabEnemyMissile.map(function(object) {
     			object.update();
    		});
@@ -235,10 +250,16 @@ function Enemy(X, Y, xSpeed, ySpeed, level) {
 		}
 	
 	};
+	this.collision = function(p) {
+			if (p.x + p.width > this.x && this.y < p.y + p.height && this.y > p.y) {
+				this.explosion();
+			}
+	};
 	this.explosion = function() {
 		this.xSpeed = 0;
 		this.ySpeed = 0;
-		this.alive = 1;
+		this.alive = 0;
+		this.anim = 0;
 	};
 };
 //Enemies's shots 
@@ -330,6 +351,34 @@ function spawningEnemies() {
 }
 /////////////////////////////////
 
+function initImg() {
+	var cpt;
+	for (cpt = 0; cpt < 5 ; cpt++) {
+		canvasCreated = document.createElement("canvas");
+		canvasContext = canvasCreated.getContext("2d");
+		canvasContext.width = 64;
+		canvasContext.height = 28;
+		canvasContext.drawImage(imgPlayer, 0, 29*cpt, canvasContext.width, canvasContext.height, 0, 0, player.width, player.height);
+		tabImgPlayer.push(canvasCreated);
+	}
+	for (cpt = 0; cpt < 7 ; cpt++) {
+		canvasCreated2 = document.createElement("canvas");
+		canvasContext2 = canvasCreated2.getContext("2d");
+		canvasContext2.width = 40;
+		canvasContext2.height = 30;
+		canvasContext2.drawImage(imgEnemyLvl1, 0, 30*cpt, canvasContext2.width, canvasContext2.height, 0, 0, canvasContext2.width/2, canvasContext2.height/2);
+		tabImgEnemy.push(canvasCreated2);
+	}
+	for (cpt = 0; cpt < 10 ; cpt++) {
+		canvasCreated3 = document.createElement("canvas");
+		canvasContext3 = canvasCreated3.getContext("2d");
+		canvasContext3.width = 64;
+		canvasContext3.height = 64;
+		canvasContext3.drawImage(imgExplosion, 64*cpt, 0, canvasContext3.width, canvasContext3.height, 0, 0, 10, 10);
+		tabImgExplosion.push(canvasCreated3);
+	}
+}
+
 
 
 function updateScene() {
@@ -348,6 +397,7 @@ function updateItems() {
     }); 
     tabEnemy.map(function(object) {
     	object.update();
+    	object.collision(player);
     });
     updateTime();
     
@@ -371,8 +421,6 @@ function drawItems() {
     	object.draw();
     });
 }
-
-var i;
 
 function clearItems() {
     "use strict"; 
@@ -428,7 +476,7 @@ function init() {
     canArena.setAttribute("width", ArenaWidth );
     conArena = canArena.getContext("2d");
     divArena.appendChild(canArena);
- 
+    initImg(); 
     
 window.addEventListener("keydown", keyDownHandler, false);
 window.addEventListener("keyup", keyUpHandler, false);
