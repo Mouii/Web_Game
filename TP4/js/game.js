@@ -11,6 +11,7 @@ var canArena;
 var conArena;
 var ArenaWidth = 500;
 var ArenaHeight = 300;
+var runAnimation = true;
 
 //Background
 var imgBackground;
@@ -63,8 +64,11 @@ var tabImgPlayer = new Array();
 var tabImgEnemy = new Array();
 var tabImgExplosion = new Array();
 
+var fireRate = 10;
+var fire = 0;
+
 var player = {
-	x: 20,
+	x : 20,
 	y : 100,
 	speed : 10,
 	height : 15,
@@ -74,38 +78,60 @@ var player = {
 	anim : 0,
 	nbLives : 3,
 	score : 0,
+	boom : 0,
+	godmod : 0,
 	draw : function() {
 		//this.anim = (this.anim + 29)%116;
 		//conArena.drawImage(imgPlayer, 0, this.anim, this.imgWidth, this.imgHeight, this.x, this.y, this.width, this.height);
-		conArena.drawImage(tabImgPlayer[this.anim],this.x, this.y);
+		if (this.boom == 0) {
+			conArena.drawImage(tabImgPlayer[this.anim],this.x, this.y);
+
+		} else {
+			conArena.drawImage(tabImgExplosion[this.anim],this.x, this.y);
+			if (this.anim == 9) {
+				this.boom = 0;
+				this.godmod = 0;
+				this.anim = 0;
+			}
+		}
 	},
 	clear : function() {
 		conArena.clearRect(this.x, this.y, this.width, this.height);	
 	},
 	update : function() {
-		this.anim = (this.anim + 1)%4;
+		if (this.boom == 0) this.anim = (this.anim + 1)%4;
+		else this.anim = (this.anim + 1) % 10;
 		var keycode;
     		for (keycode in keyStatus) {
             		if (keyStatus[keycode] == true){
                 		if (keycode == keys.UP) { 
                     			this.y -= this.speed;  
                     			if (this.y < 0) this.y = 0; 
+                    			fire = 0;
                 		}
                			if (keycode == keys.DOWN) { 
                     			this.y += this.speed;   
                    			if ((this.y + this.height) > ArenaHeight ) this.y = ArenaHeight - this.height;
+                   			fire = 0;
                 		} 
-                		if (keycode == keys.SPACE) { 
-                    			projectile = new missile();
-                    			tabProjectile.unshift(projectile);
+                		if (keycode == keys.SPACE) {
+                				if (fire == fireRate || fire == 0) {
+		            				projectile = new missile();
+		            				tabProjectile.unshift(projectile);
+		            				fire = 0;
+		            			}
+		            		fire += 1;
                 		}
-     
             		}	
         		keyStatus[keycode] = false;
    		}
 	},
 	lostLife : function() {
 		--this.nbLives;
+		if (this.nbLives == 0) {
+			runAnimation = false;
+			alert("GAME OVER");
+		}
 	},
 	winLife : function() {
 		++this.nbLives;
@@ -114,7 +140,10 @@ var player = {
 		this.score++;
 	},
 	explosion : function() {
-		
+		this.lostLife();
+		this.anim = 0;
+		this.boom = 1;
+		this.godmod = 1;
 	}
 };
 
@@ -221,7 +250,7 @@ function Enemy(X, Y, xSpeed, ySpeed, level) {
 		conArena.clearRect(this.x, this.y-1, this.width, this.height+1);
 		this.tabEnemyMissile.map(function(object,index,array) {
     			object.clear();
-			if (object.y >= ArenaHeight || object.x <= 0) {
+			if (object.y >= ArenaHeight || object.x <= 0 || object.hit == true) {
     				delete array[index];
     				array.splice(index,1);
     			}  
@@ -239,6 +268,7 @@ function Enemy(X, Y, xSpeed, ySpeed, level) {
 		}
 		this.tabEnemyMissile.map(function(object) {
     			object.update();
+    			object.collision(player);
    		});
 	};
 	this.shoot = function() {
@@ -251,8 +281,9 @@ function Enemy(X, Y, xSpeed, ySpeed, level) {
 	
 	};
 	this.collision = function(p) {
-			if (p.x + p.width > this.x && this.y < p.y + p.height && this.y > p.y) {
+			if (p.x + p.width >= this.x && this.y <= p.y + p.height && this.y >= p.y && this.x <= p.x && p.godmod == 0) {
 				this.explosion();
+				p.explosion();
 			}
 	};
 	this.explosion = function() {
@@ -270,6 +301,7 @@ function enemyMissile(Enemy, level) {
 	this.width = 8;
 	this.height = 4;
 	this.level = level;
+	this.hit = false;
 	if (this.y > player.y ) {
 		this.direction = 1;
 	} else if (this.y < player.y) {
@@ -314,38 +346,54 @@ function enemyMissile(Enemy, level) {
 			default:
 				break;
 		}
-	}
+	};
+	this.collision = function(p) {
+			if (p.x + p.width >= this.x && this.y <= p.y + p.height && this.y >= p.y && this.x <= p.x && p.godmod == 0) {
+				p.explosion();
+				this.hit = true;
+			}
+	};
 };
 
 var gameTime = {
-	ms : 0,
-	s : 0,
-	m : 0,
-	h : 0,
+	x : 15,
+	y : 15,
+	height : 40,
+	width : 80,
+	ms : 00,
+	s : 00,
+	m : 00,
 	add : function() {
-		this.ms += 1;
+		this.ms += 01;
 		if (this.ms == 60) {
-			this.ms = 0;
-			this.s += 1;
-			if (this.s%2 == 0) spawningEnemies();
+			this.ms = 00;
+			this.s += 01;
+			if (this.s%1 == 0) spawningEnemies(1);
 		}
 		if (this.s == 60) {
-			this.s = 0;
-			this.m += 1;
+			this.s = 00;
+			this.m += 01;
 		}
-		if (this.m == 60) {
-			this.m = 0;
-			this.h += 1;
-		}
+	},
+	draw : function() {
+		conArena.save();
+		conArena.fillStyle = "white";
+		conArena.fillText(("SCORE " + player.score), this.x, this.y);
+		conArena.fillText(("TIME " + this.m + " : " + this.s), this.x, this.y+10);
+		conArena.fillText(("LIVES " + player.nbLives), this.x, this.y+20);
+		conArena.restore();
+	},
+	clear : function() {
+		conArena.clearRect(0, 0, this.width, this.height);
 	}
 
 };
 
-function spawningEnemies() {
+function spawningEnemies(level) {
 	var sideSpawn = Math.floor((Math.random() * 100));
 	var xSpawnSpeed = Math.floor((Math.random() * -10) + 1)/4;
 	var ySpawnSpeed = Math.floor((Math.random() * 2) + 1)/4;
-	enemy = new Enemy(ArenaWidth, sideSpawn, xSpawnSpeed, ySpawnSpeed, 1);
+	enemy = new Enemy(ArenaWidth, sideSpawn, xSpawnSpeed, ySpawnSpeed, level);
 	tabEnemy.push(enemy);
 
 }
@@ -374,7 +422,7 @@ function initImg() {
 		canvasContext3 = canvasCreated3.getContext("2d");
 		canvasContext3.width = 64;
 		canvasContext3.height = 64;
-		canvasContext3.drawImage(imgExplosion, 64*cpt, 0, canvasContext3.width, canvasContext3.height, 0, 0, 10, 10);
+		canvasContext3.drawImage(imgExplosion, 64*cpt, 0, canvasContext3.width, canvasContext3.height, 0, 0, 23, 23);
 		tabImgExplosion.push(canvasCreated3);
 	}
 }
@@ -420,6 +468,7 @@ function drawItems() {
     tabEnemy.map(function(object) {
     	object.draw();
     });
+    gameTime.draw();
 }
 
 function clearItems() {
@@ -439,7 +488,7 @@ function clearItems() {
     		if (array[index] != null) array[index].clear();	//To make sure there is no drawing error
     	}  
     });
-    
+    gameTime.clear();
 }
 
 function updateGame() {
@@ -464,7 +513,7 @@ function mainloop () {
 function recursiveAnim () {
     "use strict"; 
     mainloop();
-    animFrame( recursiveAnim );
+    if (runAnimation) animFrame( recursiveAnim );
 }
  
 function init() {
