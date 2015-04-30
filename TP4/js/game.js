@@ -212,20 +212,6 @@ function Enemy(X, Y, xSpeed, ySpeed, level) {
 	this.imgExplosion = 0;
 	this.alive = 1;
 	this.tabEnemyMissile = new Array();
-	switch (level) {
-		case 2 :
-			this.image = imgEnemyLvl2;
-			break;
-		case 3 :
-			this.image = imgEnemyLvl3;
-			break;
-		case 4 : 
-			this.image = imgEnemyLvl4;
-			break;
-		default:
-			this.image = imgEnemyLvl1;
-			break;
-	}
 	this.draw = function() {
 		//this.anim = (this.anim+30)%180;
 		if (this.alive == 0) {
@@ -263,7 +249,29 @@ function Enemy(X, Y, xSpeed, ySpeed, level) {
 		this.x += this.xSpeed;
 		this.y += this.ySpeed;
 		if (this.alive == 1) {
-			this.anim = (this.anim +1) % 6;
+			switch(level) {
+				case 2:
+					this.anim = ((this.anim +1) % 6) + 6;
+					if (this.y < player.y) this.ySpeed = 1;
+					if (this.y > player.y) this.ySpeed = -1;
+					if (this.x > player.x) this.xSpeed = -3;
+					break;
+				case 3:
+					this.anim = ((this.anim +1) % 6) + 12;
+					if (this.x <= ArenaWidth/2) {
+						this.xSpeed = 0;
+						if (this.y == player.y) this.ySpeed = 0;
+						if (this.y < player.y) this.ySpeed = 1;
+						if (this.y > player.y) this.ySpeed = -1;
+					}
+					break;
+				case 4: 
+					this.anim = ((this.anim +1) % 6) + 18;
+					break;
+				default:
+					this.anim = (this.anim +1) % 6;
+					break;
+			}
 			this.shoot();
 		}
 		this.tabEnemyMissile.map(function(object) {
@@ -272,7 +280,13 @@ function Enemy(X, Y, xSpeed, ySpeed, level) {
    		});
 	};
 	this.shoot = function() {
-		this.cptShoot = (this.cptShoot+10)%2000;
+		if (this.level == 3) {
+			this.cptShoot = (this.cptShoot+10)%500;
+		} else if (this.level == 3) {
+			this.cptShoot = (this.cptShoot+10)%1000;
+		} else {
+			this.cptShoot = (this.cptShoot+10)%2000;
+		}
 		if (this.cptShoot == 10) {
 			var enemyShot;
 			enemyShot = new enemyMissile(this, this.level);
@@ -322,13 +336,12 @@ function enemyMissile(Enemy, level) {
 				this.updatelvl1();
 				break;
 			case 2:
-			
+				this.updatelvl2();
 				break;
 			case 3:
-				
+				this.updatelvl3();
 				break;	
-			case 4: 
-			
+			case 4: 		
 				break;
 			default:
 				break;
@@ -344,6 +357,33 @@ function enemyMissile(Enemy, level) {
 				this.y -= this.speed/5;
 				break;
 			default:
+				break;
+		}
+	};
+	this.updatelvl2 = function() {
+		this.x -= this.speed;
+		switch (this.direction) {
+			case (-1):
+				this.y += this.speed/5;
+				break;
+			case 1 :
+				this.y -= this.speed/5;
+				break;
+			default:
+				break;
+		}
+	};
+	this.updatelvl3 = function() {
+		this.x -= this.speed;
+		switch (this.direction) {
+			case (-1):
+				this.y += this.speed/5;
+				break;
+			case 1 :
+				this.y -= this.speed/5;
+				break;
+			default:
+				this.y += 0;
 				break;
 		}
 	};
@@ -368,7 +408,9 @@ var gameTime = {
 		if (this.ms == 60) {
 			this.ms = 00;
 			this.s += 01;
-			if (this.s%1 == 0) spawningEnemies(1);
+			if (this.s%2 == 0) spawningEnemies(1);
+			if (this.s%10 == 0 && this.s != 0) spawningEnemies(2);
+			if (player.score%23 == 0 && player.score != 0) spawningEnemies(3);
 		}
 		if (this.s == 60) {
 			this.s = 00;
@@ -401,6 +443,8 @@ function spawningEnemies(level) {
 
 function initImg() {
 	var cpt;
+	var cpt2;
+	var IMG;
 	for (cpt = 0; cpt < 5 ; cpt++) {
 		canvasCreated = document.createElement("canvas");
 		canvasContext = canvasCreated.getContext("2d");
@@ -409,14 +453,23 @@ function initImg() {
 		canvasContext.drawImage(imgPlayer, 0, 29*cpt, canvasContext.width, canvasContext.height, 0, 0, player.width, player.height);
 		tabImgPlayer.push(canvasCreated);
 	}
-	for (cpt = 0; cpt < 7 ; cpt++) {
-		canvasCreated2 = document.createElement("canvas");
-		canvasContext2 = canvasCreated2.getContext("2d");
-		canvasContext2.width = 40;
-		canvasContext2.height = 30;
-		canvasContext2.drawImage(imgEnemyLvl1, 0, 30*cpt, canvasContext2.width, canvasContext2.height, 0, 0, canvasContext2.width/2, canvasContext2.height/2);
-		tabImgEnemy.push(canvasCreated2);
+	
+	for (cpt2 = 0; cpt2 < 4; cpt2++) {
+		if (cpt2 == 0) IMG = imgEnemyLvl1;	
+		if (cpt2 == 1) IMG = imgEnemyLvl2;
+		if (cpt2 == 2) IMG = imgEnemyLvl3;
+		if (cpt2 == 3) IMG = imgEnemyLvl4;
+
+		for (cpt = 0; cpt < 6 ; cpt++) {
+			canvasCreated2 = document.createElement("canvas");
+			canvasContext2 = canvasCreated2.getContext("2d");
+			canvasContext2.width = 40;
+			canvasContext2.height = 30;
+			canvasContext2.drawImage(IMG, 0, 30*cpt, canvasContext2.width, canvasContext2.height, 0, 0, canvasContext2.width/2, canvasContext2.height/2);
+			tabImgEnemy.push(canvasCreated2);
+		}
 	}
+	
 	for (cpt = 0; cpt < 10 ; cpt++) {
 		canvasCreated3 = document.createElement("canvas");
 		canvasContext3 = canvasCreated3.getContext("2d");
