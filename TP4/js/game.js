@@ -51,9 +51,6 @@ function keyUpHandler(event) {
         }
         
     }
-///////////////////////////////////
-
-
 
 /////////////////////////////////
 // Hero Player
@@ -146,10 +143,10 @@ var player = {
 		this.godmod = 1;
 	}
 };
-
+/////////////////////////////////
 //Missiles shot by the player
 var imgMissile = new Image();
-imgMissile.src = "./assets/Ship/missile.png";
+imgMissile.src = "./assets/missile.png";
 
 var projectile;
 
@@ -179,7 +176,7 @@ function missile() {
 		}
 	}
 };
-
+/////////////////////////////////
 //Enemies
 var imgEnemyLvl1 = new Image();
 var imgEnemyLvl2 = new Image();
@@ -282,7 +279,7 @@ function Enemy(X, Y, xSpeed, ySpeed, level) {
 	this.shoot = function() {
 		if (this.level == 3) {
 			this.cptShoot = (this.cptShoot+10)%500;
-		} else if (this.level == 3) {
+		} else if (this.level == 2) {
 			this.cptShoot = (this.cptShoot+10)%1000;
 		} else {
 			this.cptShoot = (this.cptShoot+10)%2000;
@@ -307,6 +304,7 @@ function Enemy(X, Y, xSpeed, ySpeed, level) {
 		this.anim = 0;
 	};
 };
+/////////////////////////////////
 //Enemies's shots 
 function enemyMissile(Enemy, level) {
 	this.x = Enemy.x + (Enemy.imgWidth)/2;
@@ -387,6 +385,20 @@ function enemyMissile(Enemy, level) {
 				break;
 		}
 	};
+	this.updatelvl4 = function() {
+		this.x -= this.speed;
+		switch (this.direction) {
+			case (-1):
+				this.y += this.speed/5;
+				break;
+			case 1 :
+				this.y -= this.speed/5;
+				break;
+			default:
+				this.y += 0;
+				break;
+		}
+	};
 	this.collision = function(p) {
 			if (p.x + p.width >= this.x && this.y <= p.y + p.height && this.y >= p.y && this.x <= p.x && p.godmod == 0) {
 				p.explosion();
@@ -394,7 +406,7 @@ function enemyMissile(Enemy, level) {
 			}
 	};
 };
-
+/////////////////////////////////
 var gameTime = {
 	x : 15,
 	y : 15,
@@ -410,7 +422,7 @@ var gameTime = {
 			this.s += 01;
 			if (this.s%2 == 0) spawningEnemies(1);
 			if (this.s%10 == 0 && this.s != 0) spawningEnemies(2);
-			if (player.score%23 == 0 && player.score != 0) spawningEnemies(3);
+			if (player.score%10 == 0 && player.score != 0) spawningEnemies(3);
 		}
 		if (this.s == 60) {
 			this.s = 00;
@@ -430,11 +442,12 @@ var gameTime = {
 	}
 
 };
-
+/////////////////////////////////
 function spawningEnemies(level) {
 	var sideSpawn = Math.floor((Math.random() * 100));
 	var xSpawnSpeed = Math.floor((Math.random() * -10) + 1)/4;
 	var ySpawnSpeed = Math.floor((Math.random() * 2) + 1)/4;
+	if (level == 3) xSpawnSpeed *= 10;
 	enemy = new Enemy(ArenaWidth, sideSpawn, xSpawnSpeed, ySpawnSpeed, level);
 	tabEnemy.push(enemy);
 
