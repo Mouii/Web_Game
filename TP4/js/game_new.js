@@ -308,6 +308,7 @@ Enemylvl1.prototype.constructor = Enemylvl1;
 Enemylvl2 = function(x,y,speedX, speedY, width, height) {
 	Enemy.call(this, x, y, speedX, speedY, width, height);
 	this.animation = new Animation("./assets/Enemy/lvl2Enemy.png",6, width, height);
+	this.fireRate = 1000;
 };
 Enemylvl2.prototype = Object.create(Enemy.prototype);
 Enemylvl2.prototype.constructor = Enemylvl2;
@@ -337,6 +338,7 @@ Enemylvl3 = function(x,y,speedX, speedY, width, height) {
 	Enemy.call(this, x, y, speedX, speedY, width, height);
 	this.animation = new Animation("./assets/Enemy/lvl3Enemy.png",6, width, height);
 	this.harassment = false;
+	this.fireRate = 500;
 };
 Enemylvl3.prototype = Object.create(Enemy.prototype);
 Enemylvl3.prototype.constructor = Enemylvl3;
@@ -352,10 +354,14 @@ Enemylvl3.prototype.update = function() {
 	  	this.fireDirectionY = 0;	
 	  	if (this.harassment) this.speedY = 0;
 	}
-	if (this.x <= ArenaWidth/2) this.harassment = true;
-	if (this.harassment) this.speed = 0;
+	if (this.x <= ArenaWidth/2) {
+		this.harassment = true;	
+	}
+	if (this.harassment) {
+		this.speed = 0;	
+		this.timeShoot = (this.timeShoot+10) % this.fireRate;
+	}
 	this.animation.update();
-	this.timeShoot = (this.timeShoot+10) % this.fireRate;
 	this.x += this.speed;
 	this.y += this.speedY;
 	this.shoot();
